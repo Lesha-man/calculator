@@ -1,22 +1,31 @@
-const mysql = require('mysql2');
+const fs = require('fs');
 
 
 class OperationDao {
     constructor() {
-        const pool = mysql.createPool(process.env.CONNECTION_STRING);
-        this.pool = pool.promise();
+        this.fileName = "history.txt";
     }
 
-    async getAll() {
-        return (await this.pool.query("SELECT * FROM operations;"))[0];
+async getAll() {
+
+    try {
+        // read contents of the file
+        return fs.readFileSync('history.txt', 'UTF-8').split(/\r?\n/);
+
+    } catch (err) {
+        console.error(err);
+        return;
     }
+}
 
     async create(operation) {
-        try {
-            await this.pool.query("INSERT INTO operations (operation) VALUE (?)", [operation])
-        } catch (e) {
-            console.log(e);
-        }
+        fs.appendFile('history.txt', `${operation}\n`, function (err) {
+            if (err) {
+                // append failed
+            } else {
+                console.error(err);
+            }
+        })
     }
 }
 
