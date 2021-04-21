@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import Display from './Display';
 import Button from './Button';
 import Row from './Row';
+import History from './History'
 import './styles/Styles.css'
+import axios from 'axios'
+import qs from 'qs'
 
 const Calculator = () => {
     const [number, setNumber] = useState('');
@@ -13,11 +16,10 @@ const Calculator = () => {
         setNumber2(number);
         setNumber('')
     };
-
     const handlerNumber = (el) => {
         if (!number.includes('.') || el !== '.') {
-            if(number.length < 8)
-                setNumber(`${(number + el).replace(/^0+/, '')}`);
+            if (number.length < 8)
+               setNumber(`${(number + el).replace(/^0+/, '')}`);
         }
     }
     const handlerFunc = (el) => {
@@ -37,31 +39,38 @@ const Calculator = () => {
     const handlerEqual = () => {
 
         if (number && number2) {
+            let result;
             switch (functionType) {
                 case '+':
-                    setNumber(`${parseFloat(number2) + parseFloat(number)}`)
+                    setNumber(result = `${parseFloat(number2) + parseFloat(number)}`)
                     break;
 
                 case '-':
-                    setNumber(`${parseFloat(number2) - parseFloat(number)}`)
+                    setNumber(result = `${parseFloat(number2) - parseFloat(number)}`)
                     break;
 
                 case '%':
-                    setNumber(`${parseFloat(number2) * 100 / parseFloat(number)}`)
+                    setNumber(result = `${parseFloat(number2) * 100 / parseFloat(number)}`)
                     break;
-                    
+
                 case '/':
-                    setNumber(`${parseFloat(number2) / parseFloat(number)}`)
+                    setNumber(result = `${parseFloat(number2) / parseFloat(number)}`)
                     break;
 
                 case '*':
-                    setNumber(`${parseFloat(number2) * parseFloat(number)}`)
+                    setNumber(result = `${parseFloat(number2) * parseFloat(number)}`)
                     break;
             }
+            sendOperation(`${number2} ${functionType} ${number} = ${result}`);
+            setNumber2('');
+            setFunctionType('');
         }
-        setNumber2('');
-        setFunctionType('');
     };
+
+    const sendOperation = (value) => {
+        axios.post('/api/history', { operation: value });
+    }
+
     const handlerNegativeFunc = () => {
         if (number) {
             if (number > 0) {
@@ -82,8 +91,9 @@ const Calculator = () => {
 
     return (
         <div>
+            <History />
             <div>
-                <Display value={ !number2 ? `${number}` : `${number2} ${functionType} ${number}`} />
+                <Display value={!number2 ? `${number}` : `${number2} ${functionType} ${number}`} />
             </div>
             <div className="buttons">
                 <Row>
