@@ -18,8 +18,7 @@ const Calculator = () => {
     };
     const handlerNumber = (el) => {
         if (!number.includes('.') || el !== '.') {
-            if (number.length < 8)
-               setNumber(`${(number + el).replace(/^0+/, '')}`);
+            setNumber(`${(number + el).replace(/^0+/, '')}`);
         }
     }
     const handlerFunc = (el) => {
